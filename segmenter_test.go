@@ -11,28 +11,32 @@ var (
 func TestSplit(t *testing.T) {
 	expect(t, "中/国/有/十/三/亿/人/口/",
 		bytesToString(splitTextToWords([]byte(
-			"中国有十三亿人口"))))
+			"中国有十三亿人口"), false)))
 
 	expect(t, "github/ /is/ /a/ /web/-/based/ /hosting/ /service/,/ /for/ /software/ /development/ /projects/./",
 		bytesToString(splitTextToWords([]byte(
-			"GitHub is a web-based hosting service, for software development projects."))))
+			"GitHub is a web-based hosting service, for software development projects."), false)))
+
+	expect(t, "GitHub/ /is/ /a/ /web/-/based/ /hosting/ /service/,/ /for/ /software/ /development/ /projects/./",
+		bytesToString(splitTextToWords([]byte(
+			"GitHub is a web-based hosting service, for software development projects."), true)))
 
 	expect(t, "中/国/雅/虎/yahoo/!/ /china/致/力/于/，/领/先/的/公/益/民/生/门/户/网/站/。/",
 		bytesToString(splitTextToWords([]byte(
-			"中国雅虎Yahoo! China致力于，领先的公益民生门户网站。"))))
+			"中国雅虎Yahoo! China致力于，领先的公益民生门户网站。"), false)))
 
-	expect(t, "こ/ん/に/ち/は/", bytesToString(splitTextToWords([]byte("こんにちは"))))
+	expect(t, "こ/ん/に/ち/は/", bytesToString(splitTextToWords([]byte("こんにちは"), false)))
 
-	expect(t, "안/녕/하/세/요/", bytesToString(splitTextToWords([]byte("안녕하세요"))))
+	expect(t, "안/녕/하/세/요/", bytesToString(splitTextToWords([]byte("안녕하세요"), false)))
 
-	expect(t, "Я/ /тоже/ /рада/ /Вас/ /видеть/", bytesToString(splitTextToWords([]byte("Я тоже рада Вас видеть"))))
+	expect(t, "Я/ /тоже/ /рада/ /Вас/ /видеть/", bytesToString(splitTextToWords([]byte("Я тоже рада Вас видеть"), false)))
 
-	expect(t, "¿/cómo/ /van/ /las/ /cosas/", bytesToString(splitTextToWords([]byte("¿Cómo van las cosas"))))
+	expect(t, "¿/cómo/ /van/ /las/ /cosas/", bytesToString(splitTextToWords([]byte("¿Cómo van las cosas"), false)))
 
-	expect(t, "wie/ /geht/ /es/ /ihnen/", bytesToString(splitTextToWords([]byte("Wie geht es Ihnen"))))
+	expect(t, "wie/ /geht/ /es/ /ihnen/", bytesToString(splitTextToWords([]byte("Wie geht es Ihnen"), false)))
 
 	expect(t, "je/ /suis/ /enchanté/ /de/ /cette/ /pièce/",
-		bytesToString(splitTextToWords([]byte("Je suis enchanté de cette pièce"))))
+		bytesToString(splitTextToWords([]byte("Je suis enchanté de cette pièce"), false)))
 }
 
 func TestSegment(t *testing.T) {

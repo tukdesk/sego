@@ -19,7 +19,8 @@ const (
 
 // 分词器结构体
 type Segmenter struct {
-	dict *Dictionary
+	dict          *Dictionary
+	CaseSensitive bool
 }
 
 // 该结构体用于记录Viterbi算法中某字元处的向前分词跳转信息
@@ -85,7 +86,7 @@ func (seg *Segmenter) LoadDictionary(files string) error {
 			}
 
 			// 将分词添加到字典中
-			words := splitTextToWords([]byte(text))
+			words := splitTextToWords([]byte(text), seg.CaseSensitive)
 			token := Token{text: words, frequency: frequency, pos: pos}
 			seg.dict.addToken(&token)
 		}
@@ -144,7 +145,7 @@ func (seg *Segmenter) internalSegment(bytes []byte, searchMode bool) []Segment {
 	}
 
 	// 划分字元
-	text := splitTextToWords(bytes)
+	text := splitTextToWords(bytes, seg.CaseSensitive)
 
 	return seg.segmentWords(text, searchMode)
 }
@@ -245,7 +246,14 @@ func maxInt(a, b int) int {
 }
 
 // 将文本划分成字元
-func splitTextToWords(text Text) []Text {
+func splitTextToWords(text Text, caseSensitive bool) []Text {
+	var letterConverter func([]byte) []byte
+	if caseSensitive {
+		letterConverter = letterConverterNon
+	} else {
+		letterConverter = toLower
+	}
+
 	output := make([]Text, len(text))
 	current := 0
 	currentWord := 0
@@ -263,7 +271,7 @@ func splitTextToWords(text Text) []Text {
 			if inAlphanumeric {
 				inAlphanumeric = false
 				if current != 0 {
-					output[currentWord] = toLower(text[alphanumericStart:current])
+					output[currentWord] = letterConverter(text[alphanumericStart:current])
 					currentWord++
 				}
 			}
@@ -276,7 +284,7 @@ func splitTextToWords(text Text) []Text {
 	// 处理最后一个字元是英文的情况
 	if inAlphanumeric {
 		if current != 0 {
-			output[currentWord] = toLower(text[alphanumericStart:current])
+			output[currentWord] = letterConverter(text[alphanumericStart:current])
 			currentWord++
 		}
 	}
@@ -295,4 +303,8 @@ func toLower(text []byte) []byte {
 		}
 	}
 	return output
+}
+
+func letterConverterNon(text []byte) []byte {
+	return text
 }
