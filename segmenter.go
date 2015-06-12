@@ -19,8 +19,7 @@ const (
 
 // 分词器结构体
 type Segmenter struct {
-	dict          *Dictionary
-	CaseSensitive bool
+	dict *Dictionary
 }
 
 // 该结构体用于记录Viterbi算法中某字元处的向前分词跳转信息
@@ -86,9 +85,17 @@ func (seg *Segmenter) LoadDictionary(files string) error {
 			}
 
 			// 将分词添加到字典中
-			words := splitTextToWords([]byte(text), seg.CaseSensitive)
+			words := splitTextToWords([]byte(text), true)
 			token := Token{text: words, frequency: frequency, pos: pos}
 			seg.dict.addToken(&token)
+
+			// 包含大写字母, 则将小写格式加入字典
+			lowerStr := strings.ToLower(text)
+			if lowerStr != text {
+				lowerWords := splitTextToWords([]byte(lowerStr), false)
+				lowerToken := Token{text: lowerWords, frequency: frequency, pos: pos}
+				seg.dict.addToken(&lowerToken)
+			}
 		}
 	}
 
@@ -135,17 +142,21 @@ func (seg *Segmenter) LoadDictionary(files string) error {
 // 输出：
 //	[]Segment	划分的分词
 func (seg *Segmenter) Segment(bytes []byte) []Segment {
-	return seg.internalSegment(bytes, false)
+	return seg.internalSegment(bytes, false, false)
 }
 
-func (seg *Segmenter) internalSegment(bytes []byte, searchMode bool) []Segment {
+func (this *Segmenter) SegmentAdv(bytes []byte, searchMode, caseSensitive bool) []Segment {
+	return this.internalSegment(bytes, searchMode, caseSensitive)
+}
+
+func (seg *Segmenter) internalSegment(bytes []byte, searchMode, caseSensitive bool) []Segment {
 	// 处理特殊情况
 	if len(bytes) == 0 {
 		return []Segment{}
 	}
 
 	// 划分字元
-	text := splitTextToWords(bytes, seg.CaseSensitive)
+	text := splitTextToWords(bytes, caseSensitive)
 
 	return seg.segmentWords(text, searchMode)
 }

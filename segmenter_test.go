@@ -62,16 +62,16 @@ func TestLargeDictionary(t *testing.T) {
 		[]byte("中国人口")), false))
 
 	expect(t, "中国/ns 人口/n ", SegmentsToString(prodSeg.internalSegment(
-		[]byte("中国人口"), false), false))
+		[]byte("中国人口"), false, false), false))
 
 	expect(t, "中国/ns 人口/n ", SegmentsToString(prodSeg.internalSegment(
-		[]byte("中国人口"), true), false))
+		[]byte("中国人口"), true, false), false))
 
 	expect(t, "中华人民共和国/ns 中央人民政府/nt ", SegmentsToString(prodSeg.internalSegment(
-		[]byte("中华人民共和国中央人民政府"), true), false))
+		[]byte("中华人民共和国中央人民政府"), true, false), false))
 
 	expect(t, "中华人民共和国中央人民政府/nt ", SegmentsToString(prodSeg.internalSegment(
-		[]byte("中华人民共和国中央人民政府"), false), false))
+		[]byte("中华人民共和国中央人民政府"), false, false), false))
 
 	expect(t, "中华/nz 人民/n 共和/nz 共和国/ns 人民共和国/nt 中华人民共和国/ns 中央/n 人民/n 政府/n 人民政府/nt 中央人民政府/nt 中华人民共和国中央人民政府/nt ", SegmentsToString(prodSeg.Segment(
 		[]byte("中华人民共和国中央人民政府")), true))
