@@ -190,22 +190,23 @@ func (seg *Segmenter) segmentWords(text []Text, searchMode bool) []Segment {
 		}
 	}
 
-	// 从后向前扫描第一遍得到需要添加的分词数目
-	numSeg := 0
-	for index := len(text) - 1; index >= 0; {
-		location := index - len(jumpers[index].token.text) + 1
-		numSeg++
-		index = location - 1
+	// 从后向前扫描添加分词到最终结果
+	outputSegments := make([]Segment, len(jumpers))
+	if len(jumpers) == 0 {
+		return outputSegments
 	}
 
-	// 从后向前扫描第二遍添加分词到最终结果
-	outputSegments := make([]Segment, numSeg)
+	first := len(jumpers) - 1
+
 	for index := len(text) - 1; index >= 0; {
 		location := index - len(jumpers[index].token.text) + 1
-		numSeg--
-		outputSegments[numSeg].token = jumpers[index].token
+		outputSegments[first] = Segment{token: jumpers[index].token}
 		index = location - 1
+
+		first--
 	}
+
+	outputSegments = outputSegments[first+1:]
 
 	// 计算各个分词的字节位置
 	bytePosition := 0
