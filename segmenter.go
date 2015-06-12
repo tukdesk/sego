@@ -108,26 +108,15 @@ func (seg *Segmenter) LoadDictionary(files string) error {
 	// 对每个分词进行细致划分，用于搜索引擎模式，该模式用法见Token结构体的注释。
 	for _, token := range seg.dict.tokens {
 		segments := seg.segmentWords(token.text, true)
+		subSegments := make([]*Segment, 0, len(segments))
 
-		// 计算需要添加的子分词数目
-		numTokensToAdd := 0
-		for iToken := 0; iToken < len(segments); iToken++ {
-			if len(segments[iToken].token.text) > 1 {
-				// 略去字元长度为一的分词
-				// TODO: 这值得进一步推敲，特别是当字典中有英文复合词的时候
-				numTokensToAdd++
+		for i, one := range segments {
+			if len(one.token.text) > 1 {
+				subSegments = append(subSegments, &segments[i])
 			}
 		}
-		token.segments = make([]*Segment, numTokensToAdd)
 
-		// 添加子分词
-		iSegmentsToAdd := 0
-		for iToken := 0; iToken < len(segments); iToken++ {
-			if len(segments[iToken].token.text) > 1 {
-				token.segments[iSegmentsToAdd] = &segments[iSegmentsToAdd]
-				iSegmentsToAdd++
-			}
-		}
+		token.segments = subSegments
 	}
 
 	log.Println("sego dictionary files loaded")
