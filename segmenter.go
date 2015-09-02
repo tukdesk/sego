@@ -255,9 +255,9 @@ func splitTextToWords(text Text, caseSensitive bool) []Text {
 		letterConverter = toLower
 	}
 
-	output := make([]Text, len(text))
+	output := make([]Text, 0, len(text)/8)
+
 	current := 0
-	currentWord := 0
 	inAlphanumeric := true
 	alphanumericStart := 0
 	for current < len(text) {
@@ -272,12 +272,10 @@ func splitTextToWords(text Text, caseSensitive bool) []Text {
 			if inAlphanumeric {
 				inAlphanumeric = false
 				if current != 0 {
-					output[currentWord] = letterConverter(text[alphanumericStart:current])
-					currentWord++
+					output = append(output, letterConverter(text[alphanumericStart:current]))
 				}
 			}
-			output[currentWord] = text[current : current+size]
-			currentWord++
+			output = append(output, text[current:current+size])
 		}
 		current += size
 	}
@@ -285,12 +283,11 @@ func splitTextToWords(text Text, caseSensitive bool) []Text {
 	// 处理最后一个字元是英文的情况
 	if inAlphanumeric {
 		if current != 0 {
-			output[currentWord] = letterConverter(text[alphanumericStart:current])
-			currentWord++
+			output = append(output, letterConverter(text[alphanumericStart:current]))
 		}
 	}
 
-	return output[:currentWord]
+	return output
 }
 
 // 将英文词转化为小写
